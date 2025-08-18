@@ -62,7 +62,9 @@ const getJobProposals = async (req, res) => {
     }
 
     const result = await pool.query(`
-      SELECT p.*, u.name as freelancer_name, u.email as freelancer_email
+      SELECT p.*, u.name as freelancer_name, u.email as freelancer_email,
+             p.has_counter_bid, p.latest_counter_amount,
+             (SELECT COUNT(*) FROM counter_bids WHERE proposal_id = p.id AND status = 'pending') as pending_counter_bids
       FROM proposals p 
       JOIN users u ON p.freelancer_id = u.id 
       WHERE p.job_id = $1 
@@ -76,4 +78,113 @@ const getJobProposals = async (req, res) => {
   }
 };
 
-module.exports = { createProposal, getJobProposals };
+const updateProposalStatus = async (req, res) => {
+  try {
+    const { proposalId } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    if (!['accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be "accepted" or "rejected"' });
+    }
+
+    // Get proposal and verify ownership
+    const proposalResult = await pool.query(`
+      SELECT p.*, j.client_id 
+      FROM proposals p 
+      JOIN jobs j ON p.job_id = j.id 
+      WHERE p.id = $1
+    `, [proposalId]);
+
+    if (proposalResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Proposal not found' });
+    }
+
+    const proposal = proposalResult.rows[0];
+
+    // Check if user is the client who posted the job
+    if (proposal.client_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Check if proposal is still pending
+    if (!['pending', 'countered'].includes(proposal.status)) {
+      return res.status(400).json({ error: 'Proposal has already been processed' });
+    }
+
+    const client = await pool.connect();
+    
+    try {
+      await client.query('BEGIN');
+
+      if (status === 'accepted') {
+        // Accept this proposal
+        await client.query(
+          'UPDATE proposals SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+          ['accepted', proposalId]
+        );
+
+        // Reject all other proposals for the same job
+        await client.query(
+          'UPDATE proposals SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE job_id = $2 AND id != $3',
+          ['rejected', proposal.job_id, proposalId]
+        );
+
+        // Update job status to in_progress
+        await client.query(
+          'UPDATE jobs SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+          ['in_progress', proposal.job_id]
+        );
+
+        // Mark any pending counter bids as closed
+        await client.query(
+          'UPDATE counter_bids SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE proposal_id = $2 AND status = $3',
+          ['closed', proposalId, 'pending']
+        );
+      } else {
+        // Just reject this proposal
+        await client.query(
+          'UPDATE proposals SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+          ['rejected', proposalId]
+        );
+
+        // Mark any pending counter bids as closed
+        await client.query(
+          'UPDATE counter_bids SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE proposal_id = $2 AND status = $3',
+          ['closed', proposalId, 'pending']
+        );
+      }
+
+      await client.query('COMMIT');
+
+      // Get updated proposal
+      const updatedResult = await pool.query(`
+        SELECT p.*, u.name as freelancer_name, u.email as freelancer_email
+        FROM proposals p 
+        JOIN users u ON p.freelancer_id = u.id 
+        WHERE p.id = $1
+      `, [proposalId]);
+
+      res.json({
+        message: `Proposal ${status} successfully`,
+        proposal: updatedResult.rows[0]
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { 
+  createProposal, 
+  getJobProposals, 
+  updateProposalStatus 
+};
