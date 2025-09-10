@@ -8,6 +8,7 @@ import SignUp from './components/auth/SignUp';
 import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
 import BrowseJobs from './pages/BrowseJobs';
+import BrowseFreelancers from './pages/BrowseFreelancers';
 import JobDetail from './components/jobs/JobDetail';
 import PostJob from './components/jobs/PostJob';
 import Profile from './components/profile/Profile';
@@ -25,6 +26,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               <Route path="/browse-jobs" element={<BrowseJobs />} />
+              <Route path="/browse-freelancers" element={<BrowseFreelancers />} />
               <Route path="/jobs/:id" element={<JobDetail />} />
               <Route 
                 path="/dashboard" 

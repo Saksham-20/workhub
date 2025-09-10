@@ -22,7 +22,7 @@ class ProfileController {
   static async updateProfile(req, res) {
     try {
       const userId = req.user.id;
-      const profileData = req.body;
+      const profileData = req.body || {};
 
       // Remove sensitive fields that shouldn't be updated via profile
       delete profileData.id;
@@ -31,7 +31,35 @@ class ProfileController {
       delete profileData.password;
       delete profileData.created_at;
 
-      const updatedProfile = await User.updateProfile(userId, profileData);
+      // Drop unknown fields pre-emptively to avoid silent 500s from SQL
+      const knownFields = new Set([
+        'name','profile_picture','bio','location','hourly_rate','skills',
+        'languages','availability','experience_level','education',
+        'certifications','portfolio','testimonials','employment_history',
+        'other_experiences','licenses','company_name','company_description',
+        'company_website','company_size','industry','title','profile_boost',
+        'work_history','project_catalog','budget_range','project_duration',
+        'timezone_preference'
+      ]);
+      Object.keys(profileData).forEach((k) => {
+        if (!knownFields.has(k) || profileData[k] === undefined) {
+          delete profileData[k];
+        }
+      });
+
+      if (Object.keys(profileData).length === 0) {
+        return res.status(400).json({ error: 'No valid fields to update' });
+      }
+
+      let updatedProfile;
+      try {
+        updatedProfile = await User.updateProfile(userId, profileData);
+      } catch (err) {
+        if (err && /No valid profile fields to update/i.test(err.message)) {
+          return res.status(400).json({ error: 'No valid fields to update' });
+        }
+        throw err;
+      }
       res.json({ 
         message: 'Profile updated successfully', 
         profile: updatedProfile 

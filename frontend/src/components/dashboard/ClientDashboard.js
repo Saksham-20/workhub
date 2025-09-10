@@ -74,7 +74,7 @@ const ClientDashboard = () => {
           <Link to="/post-job" className="btn-primary">
             Post a New Job
           </Link>
-          <Link to="/browse-jobs" className="btn-secondary">
+          <Link to="/browse-freelancers" className="btn-secondary">
             Browse Freelancers
           </Link>
         </div>

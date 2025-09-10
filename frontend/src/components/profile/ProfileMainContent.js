@@ -130,10 +130,33 @@ const ProfileMainContent = ({ profile, onEdit, userRole }) => {
 
       {/* Work history */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Work history</h2>
-        <div className="text-center py-8">
-          <p className="text-gray-500">No items</p>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Work history</h2>
+          <button
+            onClick={() => onEdit('work_history')}
+            className="w-5 h-5 text-green-600 hover:text-green-700"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
         </div>
+        {profile.work_history && profile.work_history.length > 0 ? (
+          <div className="space-y-4">
+            {profile.work_history.map((job, index) => (
+              <div key={index} className="border-l-4 border-green-500 pl-4">
+                <h3 className="font-medium text-gray-900">{job.position}</h3>
+                <p className="text-sm text-gray-600">{job.company}</p>
+                <p className="text-sm text-gray-500">{job.start} - {job.end}</p>
+                {job.description && <p className="text-sm text-gray-700 mt-2">{job.description}</p>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No work history added</p>
+          </div>
+        )}
       </div>
 
       {/* Skills */}
@@ -168,14 +191,37 @@ const ProfileMainContent = ({ profile, onEdit, userRole }) => {
 
       {/* Project catalog */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Your project catalog</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Your project catalog</h2>
+          <button
+            onClick={() => onEdit('project_catalog')}
+            className="w-5 h-5 text-green-600 hover:text-green-700"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+        </div>
         <p className="text-gray-700 mb-4">
           Projects are a new way to earn on Upwork that helps you do more of the work you love to do. 
           Create project offerings that highlight your strengths and attract more clients.
         </p>
-        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-          Manage projects
-        </button>
+        {profile.project_catalog && profile.project_catalog.length > 0 ? (
+          <div className="space-y-4">
+            {profile.project_catalog.map((project, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900">{project.title}</h3>
+                <p className="text-sm text-gray-600">{project.price} • {project.duration}</p>
+                {project.description && <p className="text-sm text-gray-700 mt-2">{project.description}</p>}
+                {project.category && <span className="inline-block mt-2 px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded">{project.category}</span>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No projects added yet</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -208,7 +254,17 @@ const ProfileMainContent = ({ profile, onEdit, userRole }) => {
 
       {/* Hiring Preferences */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Hiring Preferences</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Hiring Preferences</h2>
+          <button
+            onClick={() => onEdit('hiring_preferences')}
+            className="w-5 h-5 text-green-600 hover:text-green-700"
+          >
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+        </div>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Experience Level</label>
@@ -216,7 +272,15 @@ const ProfileMainContent = ({ profile, onEdit, userRole }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Project Budget Range</label>
-            <p className="text-gray-600">Not specified</p>
+            <p className="text-gray-600">{profile.budget_range || 'Not specified'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Project Duration</label>
+            <p className="text-gray-600">{profile.project_duration || 'Not specified'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Timezone Preference</label>
+            <p className="text-gray-600">{profile.timezone_preference || 'Not specified'}</p>
           </div>
         </div>
       </div>

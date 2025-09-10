@@ -1,5 +1,15 @@
 const { pool } = require('../config/database');
 
+const allowedProfileFields = [
+  'name', 'profile_picture', 'bio', 'location', 'hourly_rate', 'skills',
+  'languages', 'availability', 'experience_level', 'education',
+  'certifications', 'verifications', 'portfolio', 'testimonials', 'employment_history',
+  'other_experiences', 'licenses', 'company_name', 'company_description',
+  'company_website', 'company_size', 'industry', 'title', 'profile_boost',
+  'work_history', 'project_catalog', 'budget_range', 'project_duration',
+  'timezone_preference', 'social_links'
+];
+
 class User {
   static async create(userData) {
     const { email, password, name, role } = userData;
@@ -56,13 +66,12 @@ class User {
   }
 
   static async updateProfile(id, profileData) {
-    const allowedFields = [
-      'profile_picture', 'bio', 'location', 'hourly_rate', 'skills',
-      'languages', 'availability', 'experience_level', 'education',
-      'certifications', 'portfolio', 'testimonials', 'employment_history',
-      'other_experiences', 'licenses', 'company_name', 'company_description',
-      'company_website', 'company_size', 'industry'
-    ];
+    const allowedFields = allowedProfileFields;
+    const jsonFields = new Set([
+      'languages', 'education', 'certifications', 'verifications', 'portfolio', 'testimonials',
+      'employment_history', 'other_experiences', 'licenses', 'work_history',
+      'project_catalog', 'social_links'
+    ]);
 
     const fields = [];
     const values = [];
@@ -70,8 +79,27 @@ class User {
 
     Object.entries(profileData).forEach(([key, value]) => {
       if (allowedFields.includes(key) && value !== undefined) {
+        let normalizedValue = value;
+        if (jsonFields.has(key)) {
+          try {
+            // If value is a string, try to parse; else stringify objects/arrays
+            if (typeof value === 'string') {
+              normalizedValue = JSON.parse(value);
+            }
+            normalizedValue = JSON.stringify(normalizedValue ?? null);
+          } catch (_) {
+            // Fallback to safe stringifying
+            normalizedValue = JSON.stringify(value ?? null);
+          }
+        } else if (key === 'hourly_rate') {
+          const num = Number(value);
+          normalizedValue = Number.isFinite(num) ? num : null;
+        } else if (key === 'profile_boost') {
+          normalizedValue = Boolean(value);
+        }
+
         fields.push(`${key} = $${paramCounter}`);
-        values.push(value);
+        values.push(normalizedValue);
         paramCounter++;
       }
     });
@@ -97,10 +125,11 @@ class User {
       SELECT 
         id, email, name, role, profile_picture, bio, location,
         hourly_rate, skills, languages, availability, experience_level,
-        education, certifications, portfolio, testimonials,
+        education, certifications, verifications, portfolio, testimonials,
         employment_history, other_experiences, licenses, company_name,
         company_description, company_website, company_size, industry,
-        created_at, updated_at
+        title, profile_boost, work_history, project_catalog, budget_range,
+        project_duration, timezone_preference, social_links, created_at, updated_at
       FROM users 
       WHERE id = $1
     `;
@@ -122,27 +151,46 @@ class User {
     const values = [];
     let paramCounter = 1;
 
-    if (filters.skills && filters.skills.length > 0) {
+    // Search by name or bio
+    if (filters.search) {
+      query += ` AND (name ILIKE $${paramCounter} OR bio ILIKE $${paramCounter + 1})`;
+      values.push(`%${filters.search}%`);
+      values.push(`%${filters.search}%`);
+      paramCounter += 2;
+    }
+
+    // Search by skills
+    if (filters.skills) {
       query += ` AND skills && $${paramCounter}`;
-      values.push(filters.skills);
+      values.push([filters.skills]);
       paramCounter++;
     }
 
+    // Search by location
     if (filters.location) {
       query += ` AND location ILIKE $${paramCounter}`;
       values.push(`%${filters.location}%`);
       paramCounter++;
     }
 
-    if (filters.maxHourlyRate) {
-      query += ` AND hourly_rate <= $${paramCounter}`;
-      values.push(filters.maxHourlyRate);
+    // Filter by minimum hourly rate
+    if (filters.minRate) {
+      query += ` AND hourly_rate >= $${paramCounter}`;
+      values.push(parseFloat(filters.minRate));
       paramCounter++;
     }
 
-    if (filters.experienceLevel) {
+    // Filter by maximum hourly rate
+    if (filters.maxRate) {
+      query += ` AND hourly_rate <= $${paramCounter}`;
+      values.push(parseFloat(filters.maxRate));
+      paramCounter++;
+    }
+
+    // Filter by experience level
+    if (filters.experience_level) {
       query += ` AND experience_level = $${paramCounter}`;
-      values.push(filters.experienceLevel);
+      values.push(filters.experience_level);
       paramCounter++;
     }
 
