@@ -22,6 +22,16 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests explicitly
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
+
 app.use(express.json());
 
 // Routes
@@ -33,6 +43,25 @@ app.use('/api/profile', profileRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'WorkHub API is running' });
+});
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// CORS test endpoint
+app.post('/api/test-cors', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'CORS test successful',
+    body: req.body,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Favicon handler
