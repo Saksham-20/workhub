@@ -1,0 +1,20 @@
+{
+  "name": "workhub",
+  "version": "1.0.0",
+  "description": "Professional freelance marketplace platform",
+  "main": "workhub/backend/server.js",
+  "scripts": {
+    "start": "cd workhub/backend && npm start",
+    "dev": "cd workhub/backend && npm run dev",
+    "build": "cd workhub/frontend && npm run build",
+    "install-all": "cd workhub/backend && npm install && cd ../frontend && npm install",
+    "migrate": "cd workhub/backend && node run-migrations.js",
+    "create-demo": "cd workhub/backend && node create_demo_simple.js && node create_demo_jobs.js && node create_demo_proposals.js"
+  },
+  "keywords": ["freelance", "marketplace", "jobs", "react", "nodejs", "postgresql"],
+  "author": "Nishant Puri",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
