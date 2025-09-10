@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Job = require('../models/Job');
 
 class ProfileController {
   // Get user profile
@@ -11,7 +12,18 @@ class ProfileController {
         return res.status(404).json({ error: 'Profile not found' });
       }
 
-      res.json({ profile });
+      // Add job statistics for clients
+      let jobStats = null;
+      if (profile.role === 'client') {
+        try {
+          jobStats = await Job.getJobStats(userId);
+        } catch (error) {
+          console.error('Error fetching job stats:', error);
+          // Don't fail the entire request if job stats fail
+        }
+      }
+
+      res.json({ profile, jobStats });
     } catch (error) {
       console.error('Error getting profile:', error);
       res.status(500).json({ error: 'Internal server error' });

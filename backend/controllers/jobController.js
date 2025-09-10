@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { pool } = require('../config/database');
+const Job = require('../models/Job');
 
 const createJob = async (req, res) => {
   try {
@@ -129,4 +130,55 @@ const getMyJobs = async (req, res) => {
   }
 };
 
-module.exports = { createJob, getJobs, getJobById, getMyJobs };
+const deleteJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    // First check if the job exists and belongs to the user
+    const job = await Job.findById(id);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    if (job.client_id !== userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this job' });
+    }
+    
+    // Delete the job
+    await Job.delete(id);
+    
+    res.json({ message: 'Job deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting job:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const updateData = req.body;
+    
+    // First check if the job exists and belongs to the user
+    const job = await Job.findById(id);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    
+    if (job.client_id !== userId) {
+      return res.status(403).json({ error: 'Not authorized to update this job' });
+    }
+    
+    // Update the job
+    const updatedJob = await Job.update(id, updateData);
+    
+    res.json({ message: 'Job updated successfully', job: updatedJob });
+  } catch (error) {
+    console.error('Error updating job:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { createJob, getJobs, getJobById, getMyJobs, deleteJob, updateJob };

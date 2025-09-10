@@ -2,15 +2,15 @@ const { pool } = require('../config/database');
 
 class Job {
   static async create(jobData) {
-    const { title, description, skills, budget, client_id } = jobData;
+    const { title, description, skills, budget, timeline, client_id } = jobData;
     
     const query = `
-      INSERT INTO jobs (title, description, skills, budget, client_id) 
-      VALUES ($1, $2, $3, $4, $5) 
+      INSERT INTO jobs (title, description, skills, budget, timeline, client_id) 
+      VALUES ($1, $2, $3, $4, $5, $6) 
       RETURNING *
     `;
     
-    const result = await pool.query(query, [title, description, skills, budget, client_id]);
+    const result = await pool.query(query, [title, description, skills, budget, timeline, client_id]);
     return result.rows[0];
   }
 
@@ -111,7 +111,7 @@ class Job {
 
     Object.entries(updateData).forEach(([key, value]) => {
       if (key !== 'id' && value !== undefined) {
-        fields.push(`${key} = ${paramCounter}`);
+        fields.push(`${key} = $${paramCounter}`);
         values.push(value);
         paramCounter++;
       }
@@ -125,7 +125,7 @@ class Job {
     const query = `
       UPDATE jobs 
       SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = ${paramCounter} 
+      WHERE id = $${paramCounter} 
       RETURNING *
     `;
 
