@@ -3,8 +3,8 @@ services:
     name: workhub-backend
     env: node
     plan: free
-    buildCommand: cd workhub/backend && npm install
-    startCommand: cd workhub/backend && npm start
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -21,8 +21,8 @@ services:
   - type: web
     name: workhub-frontend
     env: static
-    buildCommand: cd workhub/frontend && npm install && npm run build
-    staticPublishPath: workhub/frontend/build
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/build
     envVars:
       - key: REACT_APP_API_URL
         value: https://workhub-backend.onrender.com
