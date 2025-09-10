@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import BrowseJobs from './pages/BrowseJobs';
 import JobDetail from './components/jobs/JobDetail';
 import PostJob from './components/jobs/PostJob';
+import Profile from './components/profile/Profile';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
@@ -38,6 +39,14 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={['client']}>
                     <PostJob />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 } 
               />

@@ -48,6 +48,12 @@ const Header = () => {
                 >
                   Dashboard
                 </Link>
+                <Link 
+                  to="/profile" 
+                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Profile
+                </Link>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">
                     {user.name} ({user.role})
