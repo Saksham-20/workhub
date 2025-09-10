@@ -18,6 +18,15 @@ const pool = new Pool(
       }
 );
 
+// Test database connection
+pool.on('connect', () => {
+  console.log('Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+  console.error('Database connection error:', err);
+});
+
 const runMigrations = async () => {
   const client = await pool.connect();
   try {
