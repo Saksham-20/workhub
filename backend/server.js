@@ -55,7 +55,13 @@ app.use('/api/profile', profileRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'WorkHub API is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'WorkHub API is running',
+    version: '2.0.0',
+    timestamp: new Date().toISOString(),
+    fixes: 'CORS and login issues resolved'
+  });
 });
 
 // Test endpoint
@@ -142,5 +148,7 @@ const initializeDatabase = async () => {
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Deployment timestamp: ${new Date().toISOString()}`);
+  console.log(`Version: 2.0.0 - Login fixes applied`);
   await initializeDatabase();
 });
