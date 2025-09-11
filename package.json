@@ -11,10 +11,20 @@
     "migrate": "cd workhub/backend && node run-migrations.js",
     "create-demo": "cd workhub/backend && node create_demo_simple.js && node create_demo_jobs.js && node create_demo_proposals.js"
   },
-  "keywords": ["freelance", "marketplace", "jobs", "react", "nodejs", "postgresql"],
+  "keywords": [
+    "freelance",
+    "marketplace",
+    "jobs",
+    "react",
+    "nodejs",
+    "postgresql"
+  ],
   "author": "Nishant Puri",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.11.0"
   }
 }
