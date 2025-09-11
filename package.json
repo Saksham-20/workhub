@@ -2,14 +2,14 @@
   "name": "workhub",
   "version": "1.0.0",
   "description": "Professional freelance marketplace platform",
-  "main": "workhub/backend/server.js",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "cd workhub/backend && npm start",
-    "dev": "cd workhub/backend && npm run dev",
-    "build": "cd workhub/frontend && npm run build",
-    "install-all": "cd workhub/backend && npm install && cd ../frontend && npm install",
-    "migrate": "cd workhub/backend && node run-migrations.js",
-    "create-demo": "cd workhub/backend && node create_demo_simple.js && node create_demo_jobs.js && node create_demo_proposals.js"
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "migrate": "cd backend && node run-migrations.js",
+    "create-demo": "cd backend && node create_simple_demo.js"
   },
   "keywords": [
     "freelance",
