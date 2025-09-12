@@ -7,7 +7,7 @@ async function quickTest() {
   try {
     // Test backend health
     console.log('\n1. Testing backend health...');
-    const healthResponse = await axios.get('https://workhub-backend.onrender.com/api/health');
+    const healthResponse = await axios.get('https://workhub-jj2l.onrender.com/api/health');
     console.log('✅ Backend health: OK');
     console.log('   Response:', healthResponse.data);
   } catch (error) {
@@ -18,8 +18,8 @@ async function quickTest() {
   try {
     // Test login
     console.log('\n2. Testing login...');
-    const loginResponse = await axios.post('https://workhub-backend.onrender.com/api/auth/login', {
-      email: 'michael.demo@workhub.com',
+    const loginResponse = await axios.post('https://workhub-jj2l.onrender.com/api/auth/login', {
+      email: 'sarah.demo@workhub.com',
       password: 'demo123'
     });
     console.log('✅ Login: SUCCESS');

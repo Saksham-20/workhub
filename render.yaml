@@ -25,8 +25,9 @@ services:
     staticPublishPath: frontend/build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://workhub-backend.onrender.com
+        value: https://workhub-jj2l.onrender.com
 
 databases:
   - name: workhub-database
     plan: free
+
