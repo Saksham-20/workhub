@@ -1,3 +1,7 @@
+console.log('🔧 Loading WorkHub Backend Server...');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Port:', process.env.PORT || 5001);
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -65,6 +69,23 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/proposals', proposalRoutes);
 app.use('/api/profile', profileRoutes);
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'WorkHub Backend API is running',
+    version: '2.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth/login',
+      jobs: '/api/jobs',
+      proposals: '/api/proposals',
+      profile: '/api/profile'
+    }
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
