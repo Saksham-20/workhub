@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS proposals (
     UNIQUE(job_id, freelancer_id)
 );
 
+DROP TRIGGER IF EXISTS update_proposals_updated_at ON proposals;
 CREATE TRIGGER update_proposals_updated_at BEFORE UPDATE
 ON proposals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

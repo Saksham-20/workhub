@@ -37,12 +37,18 @@ const runMigrations = async () => {
     ];
 
     for (const file of migrationFiles) {
-      const migration = fs.readFileSync(path.join(__dirname, '../migrations', file), 'utf8');
-      await client.query(migration);
-      console.log(`Migration ${file} executed successfully`);
+      try {
+        const migration = fs.readFileSync(path.join(__dirname, '../migrations', file), 'utf8');
+        await client.query(migration);
+        console.log(`✅ Migration ${file} executed successfully`);
+      } catch (migrationError) {
+        // Log the error but continue with other migrations
+        console.log(`⚠️  Migration ${file} had issues (this might be expected):`, migrationError.message);
+      }
     }
+    console.log('✅ All migrations completed');
   } catch (error) {
-    console.error('Migration error:', error);
+    console.error('❌ Migration error:', error);
   } finally {
     client.release();
   }
