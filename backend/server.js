@@ -178,4 +178,4 @@ app.listen(PORT, async () => {
   console.log(`Deployment timestamp: ${new Date().toISOString()}`);
   console.log(`Version: 2.0.0 - Login fixes applied`);
   await initializeDatabase();
-});
+});// Deployment trigger: Fri Sep 12 14:50:31 IST 2025
