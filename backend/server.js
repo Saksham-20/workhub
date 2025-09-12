@@ -16,14 +16,37 @@ const { pool } = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// Check if port is already in use
+const server = require('http').createServer(app);
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Please try a different port.`);
+    console.log('💡 Try running: PORT=5002 node server.js');
+    process.exit(1);
+  }
+});
+
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://workhub-frontend.onrender.com',
-    'https://workhub.onrender.com',
-    'https://workhub-1-i1ga.onrender.com'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://workhub-frontend.onrender.com',
+      'https://workhub.onrender.com',
+      'https://workhub-1-i1ga.onrender.com',
+      'https://workhub-jj2l.onrender.com'
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('🔍 CORS: Blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -45,7 +68,8 @@ app.use((req, res, next) => {
     'http://localhost:3000',
     'https://workhub-frontend.onrender.com',
     'https://workhub.onrender.com',
-    'https://workhub-1-i1ga.onrender.com'
+    'https://workhub-1-i1ga.onrender.com',
+    'https://workhub-jj2l.onrender.com'
   ];
   
   if (allowedOrigins.includes(origin)) {
@@ -128,13 +152,37 @@ app.post('/api/setup-demo', async (req, res) => {
 
 // CORS test endpoint
 app.post('/api/test-cors', (req, res) => {
-  console.log('CORS test request from:', req.headers.origin);
+  console.log('🔍 CORS test request from:', req.headers.origin);
+  console.log('🔍 Request headers:', req.headers);
   res.json({ 
     status: 'OK', 
     message: 'CORS test successful',
     origin: req.headers.origin,
     body: req.body,
     timestamp: new Date().toISOString()
+  });
+});
+
+// CORS debugging endpoint
+app.get('/api/cors-debug', (req, res) => {
+  console.log('🔍 CORS Debug Request');
+  console.log('Origin:', req.headers.origin);
+  console.log('User-Agent:', req.headers['user-agent']);
+  console.log('All headers:', req.headers);
+  
+  res.json({
+    status: 'OK',
+    message: 'CORS debug info',
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent'],
+    timestamp: new Date().toISOString(),
+    allowedOrigins: [
+      'http://localhost:3000',
+      'https://workhub-frontend.onrender.com',
+      'https://workhub.onrender.com',
+      'https://workhub-1-i1ga.onrender.com',
+      'https://workhub-jj2l.onrender.com'
+    ]
   });
 });
 
@@ -193,7 +241,7 @@ const initializeDatabase = async () => {
   }
 };
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Deployment timestamp: ${new Date().toISOString()}`);

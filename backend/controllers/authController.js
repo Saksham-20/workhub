@@ -58,11 +58,16 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    console.log('Login attempt:', { email: req.body.email, timestamp: new Date().toISOString() });
+    // Enhanced logging for production visibility
+    console.log('🔐 LOGIN ATTEMPT START');
+    console.log('📧 Email:', req.body.email);
+    console.log('⏰ Timestamp:', new Date().toISOString());
+    console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
+    console.log('🔐 LOGIN ATTEMPT END');
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
+      console.log('❌ VALIDATION ERRORS:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -70,7 +75,7 @@ const login = async (req, res) => {
 
     // Check database connection
     if (!pool) {
-      console.error('Database pool not initialized');
+      console.error('❌ DATABASE POOL NOT INITIALIZED');
       return res.status(500).json({ error: 'Database connection error' });
     }
 
@@ -101,7 +106,11 @@ const login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    console.log('Login successful for user:', email);
+    console.log('✅ LOGIN SUCCESSFUL');
+    console.log('👤 User:', email);
+    console.log('🆔 User ID:', user.id);
+    console.log('🎭 Role:', user.role);
+    console.log('✅ LOGIN SUCCESSFUL END');
     res.json({
       token,
       user: {

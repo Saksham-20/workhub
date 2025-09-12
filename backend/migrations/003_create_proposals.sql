@@ -14,5 +14,5 @@ DROP TRIGGER IF EXISTS update_proposals_updated_at ON proposals;
 CREATE TRIGGER update_proposals_updated_at BEFORE UPDATE
 ON proposals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE INDEX idx_proposals_job_id ON proposals(job_id);
-CREATE INDEX idx_proposals_freelancer_id ON proposals(freelancer_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_job_id ON proposals(job_id);
+CREATE INDEX IF NOT EXISTS idx_proposals_freelancer_id ON proposals(freelancer_id);
