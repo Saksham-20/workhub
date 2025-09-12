@@ -12,21 +12,43 @@ const { pool } = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://workhub-frontend.onrender.com',
-    'https://workhub.onrender.com',
-    'https://workhub-1-i1ga.onrender.com'
-  ],
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://workhub-frontend.onrender.com',
+      'https://workhub.onrender.com',
+      'https://workhub-1-i1ga.onrender.com'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
+};
 
-// Handle preflight requests explicitly
-app.options('*', (req, res) => {
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly for all routes
+app.options('*', cors(corsOptions));
+
+app.use(express.json());
+
+// Add CORS headers to all responses
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
   const allowedOrigins = [
     'http://localhost:3000',
     'https://workhub-frontend.onrender.com',
@@ -34,18 +56,21 @@ app.options('*', (req, res) => {
     'https://workhub-1-i1ga.onrender.com'
   ];
   
-  const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
+  
+  // Log CORS requests for debugging
+  if (req.method === 'OPTIONS') {
+    console.log('CORS preflight request from:', origin);
+  }
+  
+  next();
 });
-
-app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -94,10 +119,24 @@ app.post('/api/setup-demo', async (req, res) => {
 
 // CORS test endpoint
 app.post('/api/test-cors', (req, res) => {
+  console.log('CORS test request from:', req.headers.origin);
   res.json({ 
     status: 'OK', 
     message: 'CORS test successful',
+    origin: req.headers.origin,
     body: req.body,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Login test endpoint with CORS debugging
+app.post('/api/auth/test-login', (req, res) => {
+  console.log('Test login request from:', req.headers.origin);
+  console.log('Request headers:', req.headers);
+  res.json({ 
+    status: 'OK', 
+    message: 'Login endpoint accessible',
+    origin: req.headers.origin,
     timestamp: new Date().toISOString()
   });
 });
