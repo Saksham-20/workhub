@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://workhub-jj2l.onrender.com' : 'http://localhost:5001');
+// Force production backend URL for deployed frontend
+const API_URL = process.env.REACT_APP_API_URL || 'https://workhub-jj2l.onrender.com';
+
+// Debug logging
+console.log('🔍 API Configuration:');
+console.log('   REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('   NODE_ENV:', process.env.NODE_ENV);
+console.log('   Final API_URL:', API_URL);
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
