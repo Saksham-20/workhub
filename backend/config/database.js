@@ -33,7 +33,9 @@ const runMigrations = async () => {
     const migrationFiles = [
       '001_create_users.sql',
       '002_create_jobs.sql',
-      '003_create_proposals.sql'
+      '003_create_proposals.sql',
+      '004_add_profile_fields.sql',
+      '005_create_counter_bids.sql'
     ];
 
     for (const file of migrationFiles) {
