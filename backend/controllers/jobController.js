@@ -33,7 +33,7 @@ const getJobs = async (req, res) => {
     const { search, skills, minBudget, maxBudget } = req.query;
     let query = `
       SELECT j.*, u.name as client_name, u.email as client_email,
-             (SELECT COUNT(*) FROM proposals WHERE job_id = j.id) as proposal_count
+             (SELECT COUNT(*)::INTEGER FROM proposals WHERE job_id = j.id) as proposal_count
       FROM jobs j 
       JOIN users u ON j.client_id = u.id 
       WHERE j.status = 'open'

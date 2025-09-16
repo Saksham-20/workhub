@@ -62,7 +62,7 @@ const ClientDashboard = () => {
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Proposals</h3>
           <p className="text-3xl font-bold text-blue-600">
-            {jobs.reduce((sum, job) => sum + (job.proposal_count || 0), 0)}
+            {jobs.reduce((sum, job) => sum + parseInt(job.proposal_count || 0), 0)}
           </p>
         </div>
       </div>
@@ -150,7 +150,7 @@ const ClientDashboard = () => {
                   </div>
                   
                   <div className="text-sm text-gray-600">
-                    {job.proposal_count || 0} proposals
+                    {parseInt(job.proposal_count || 0)} proposals
                   </div>
                 </div>
               </div>
