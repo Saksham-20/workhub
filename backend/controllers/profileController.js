@@ -26,7 +26,11 @@ class ProfileController {
       res.json({ profile, jobStats });
     } catch (error) {
       console.error('Error getting profile:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ 
+        error: 'Internal server error', 
+        details: error.message,
+        message: 'Profile service temporarily unavailable'
+      });
     }
   }
 

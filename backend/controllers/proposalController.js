@@ -191,11 +191,12 @@ const getUserProposals = async (req, res) => {
       return res.status(403).json({ error: 'Only freelancers can view their proposals' });
     }
 
+    // Simple query that should work with basic schema
     const result = await pool.query(`
-      SELECT p.*, j.title as job_title, j.description as job_description, 
+      SELECT p.id, p.job_id, p.cover_letter, p.bid_amount, p.status, p.created_at,
+             j.title as job_title, j.description as job_description, 
              j.budget as job_budget, j.status as job_status,
-             u.name as client_name, u.email as client_email,
-             0 as pending_counter_bids
+             u.name as client_name, u.email as client_email
       FROM proposals p 
       JOIN jobs j ON p.job_id = j.id 
       JOIN users u ON j.client_id = u.id 
@@ -205,8 +206,8 @@ const getUserProposals = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error in getUserProposals:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 };
 
