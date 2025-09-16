@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Force production backend URL for deployed frontend
-const API_URL = process.env.REACT_APP_API_URL || 'https://workhub-jj2l.onrender.com';
+const API_URL = 'https://workhub-jj2l.onrender.com';
 
 // Debug logging
 console.log('🔍 API Configuration:');
