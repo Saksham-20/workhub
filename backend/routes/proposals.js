@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { createProposal, getJobProposals, updateProposalStatus } = require('../controllers/proposalController');
+const { createProposal, getJobProposals, updateProposalStatus, getUserProposals } = require('../controllers/proposalController');
 const { 
   createCounterBid, 
   getProposalCounterBids, 
@@ -18,6 +18,7 @@ router.post('/', auth, [
   body('bidAmount').isNumeric({ min: 0 })
 ], createProposal);
 
+router.get('/user', auth, getUserProposals);
 router.get('/job/:jobId', auth, getJobProposals);
 router.put('/:proposalId', auth, [
   body('status').isIn(['accepted', 'rejected'])

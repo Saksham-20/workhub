@@ -183,8 +183,36 @@ const updateProposalStatus = async (req, res) => {
   }
 };
 
+const getUserProposals = async (req, res) => {
+  try {
+    const freelancerId = req.user.id;
+
+    if (req.user.role !== 'freelancer') {
+      return res.status(403).json({ error: 'Only freelancers can view their proposals' });
+    }
+
+    const result = await pool.query(`
+      SELECT p.*, j.title as job_title, j.description as job_description, 
+             j.budget as job_budget, j.status as job_status,
+             u.name as client_name, u.email as client_email,
+             (SELECT COUNT(*) FROM counter_bids WHERE proposal_id = p.id AND status = 'pending') as pending_counter_bids
+      FROM proposals p 
+      JOIN jobs j ON p.job_id = j.id 
+      JOIN users u ON j.client_id = u.id 
+      WHERE p.freelancer_id = $1 
+      ORDER BY p.created_at DESC
+    `, [freelancerId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = { 
   createProposal, 
   getJobProposals, 
-  updateProposalStatus 
+  updateProposalStatus,
+  getUserProposals
 };
