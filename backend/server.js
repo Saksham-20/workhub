@@ -245,6 +245,6 @@ server.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Deployment timestamp: ${new Date().toISOString()}`);
-  console.log(`Version: 2.1.0 - Demo data fixes applied`);
+  console.log(`Version: 2.2.0 - Proposals endpoint fixed`);
   await initializeDatabase();
 });// Deployment trigger: Fri Sep 12 14:50:31 IST 2025
