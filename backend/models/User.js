@@ -123,13 +123,7 @@ class User {
   static async getProfile(id) {
     const query = `
       SELECT 
-        id, email, name, role, profile_picture, bio, location,
-        hourly_rate, skills, languages, availability, experience_level,
-        education, certifications, verifications, portfolio, testimonials,
-        employment_history, other_experiences, licenses, company_name,
-        company_description, company_website, company_size, industry,
-        title, profile_boost, work_history, project_catalog, budget_range,
-        project_duration, timezone_preference, social_links, created_at, updated_at
+        id, email, name, role, created_at, updated_at
       FROM users 
       WHERE id = $1
     `;
@@ -140,10 +134,7 @@ class User {
   static async searchFreelancers(filters = {}) {
     let query = `
       SELECT 
-        id, name, profile_picture, bio, location, hourly_rate,
-        skills, languages, availability, experience_level,
-        education, certifications, portfolio, testimonials,
-        employment_history, other_experiences, created_at
+        id, name, email, role, created_at
       FROM users 
       WHERE role = 'freelancer'
     `;

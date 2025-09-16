@@ -195,7 +195,7 @@ const getUserProposals = async (req, res) => {
       SELECT p.*, j.title as job_title, j.description as job_description, 
              j.budget as job_budget, j.status as job_status,
              u.name as client_name, u.email as client_email,
-             (SELECT COUNT(*) FROM counter_bids WHERE proposal_id = p.id AND status = 'pending') as pending_counter_bids
+             0 as pending_counter_bids
       FROM proposals p 
       JOIN jobs j ON p.job_id = j.id 
       JOIN users u ON j.client_id = u.id 
