@@ -1,7 +1,7 @@
 const { pool } = require('../config/database');
 
 const allowedProfileFields = [
-  'name', 'profile_picture', 'bio', 'location', 'hourly_rate', 'skills',
+  'name', 'bio', 'location', 'hourly_rate', 'skills',
   'languages', 'availability', 'experience_level', 'education',
   'certifications', 'verifications', 'portfolio', 'testimonials', 'employment_history',
   'other_experiences', 'licenses', 'company_name', 'company_description',
@@ -194,7 +194,7 @@ class User {
   static async searchClients(filters = {}) {
     let query = `
       SELECT 
-        id, name, profile_picture, bio, location, company_name,
+        id, name, bio, location, company_name,
         company_description, company_website, company_size, industry,
         created_at
       FROM users 
@@ -242,7 +242,7 @@ class User {
 
   static async getAllClients() {
     const query = `
-      SELECT id, email, name, profile_picture, company_name, industry, created_at 
+      SELECT id, email, name, company_name, industry, created_at 
       FROM users 
       WHERE role = 'client' 
       ORDER BY created_at DESC
@@ -253,7 +253,7 @@ class User {
 
   static async getAllFreelancers() {
     const query = `
-      SELECT id, email, name, profile_picture, skills, hourly_rate, location, created_at 
+      SELECT id, email, name, skills, hourly_rate, location, created_at 
       FROM users 
       WHERE role = 'freelancer' 
       ORDER BY created_at DESC
